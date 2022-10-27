@@ -7,28 +7,23 @@ var corsOptions = {
   origin: "http://localhost:8081"
 };
 
-
-
 app.use(cors(corsOptions));
 
-// parse request of context-type - application/json 
+// parse requests of content-type - application/json
 app.use(express.json());
 
-// parse requests of context-type - application/x-www-form-urlencoded
+// parse requests of content-type - application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 
-// simple route 
+// simple route
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to my application!" });
+  res.json({ message: "Welcome to bezkoder application." });
 });
 
-//require("./app.routes/tutorial.routes.js")(app);
+require("./app/routes/tutorial.routes.js")(app);
 
-// set prot, listen for requests
+// set port, listen for requests
 const PORT = process.env.PORT || 8080;
-
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
-
-
