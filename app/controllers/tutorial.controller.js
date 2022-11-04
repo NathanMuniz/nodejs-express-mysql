@@ -1,3 +1,4 @@
+const Tutorial = require("../models/tutorial.model.js");
 
 exports.create = (req, res) => {
   // Validate request

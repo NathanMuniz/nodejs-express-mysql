@@ -8,10 +8,5 @@ var connection = mysql.createPool({
   database: dbConfig.DB
 });
 
-connection.connect(error => {
-  if (erro) throw new error;
-  console.log("Successlfy connected to the database");
-})
-
 
 module.exports = connection;
