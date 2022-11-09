@@ -10,11 +10,13 @@ const connetion = db.createConnection({
 });
 
 
-connetion.connect((err) => {
+connetion.connect(err => {
   if (err) {
     console.log("Fail connect!" + err);
   }
   console.log("Connected")
 })
+
+
 
 module.exports = connetion;
