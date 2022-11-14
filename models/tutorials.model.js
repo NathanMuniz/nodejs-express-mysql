@@ -87,9 +87,9 @@ Tutorial.published = (result) => {
   })
 }
 
-Tutorial.update = (id, tutorial, result) => {
-  mysql.query("SELECT FROM tutorials WHERE id=? SET ?",
-    [id, tutorial.title, tutorial.description, tutorial.published],
+Tutorial.updateById = (id, tutorial, result) => {
+  mysql.query("UPDATE tutorials SET title = ?, description = ?, published = ? WHERE id = ?",
+    [tutorial.title, tutorial.description, tutorial.published, id],
     (err, res) => {
       if (err) {
         console.log("erro: ", err)
@@ -100,13 +100,53 @@ Tutorial.update = (id, tutorial, result) => {
       if (res.affctedRows == 0) {
         console.log("Not found")
         result({ kind: "not_found" }, null)
+        return;
       }
 
-      console.log("Tutorial updates: ", { id: id, tutorial...})
-      result(null, res)
-
-
+      console.log("Tutorial updates: ", { id: id, ...tutorial })
+      result(null, { id: id, ...tutorial })
     })
 }
 
 
+Tutorial.removeById = (id, result) => {
+  mysql.query(`DELETE FROM tutorials WHERE id = ${id}`, (err, res) => {
+    if (err) {
+      console.log("error: ", err)
+      result(err, null)
+      return;
+    }
+
+    if (res.affctedRows == 0) {
+      result({ kind: "not_found" }, null);
+      return;
+    }
+
+    console.log("delted tutorials with id: ", id)
+    result(null, res)
+
+  })
+}
+
+
+Tutorial.remove = (result) => {
+  mysql.query("DELETE * FROM tutorials", (err, res) => {
+    if (err) {
+      console.log("error: ", err)
+      result(err, null)
+    }
+
+    if (res.affctedRows == 0) {
+      console.log("not_found")
+      result({ kind: "not_found" }, null)
+    }
+
+    console.log("All tutorials deleted")
+    result(null, res)
+
+
+
+  })
+}
+
+module.exports = Tutorial;
