@@ -19,6 +19,9 @@ app.get('/', (req, res) => {
   res.json({ message: "Wlcome to bezdoder application" })
 });
 
+
+require("./router/routes.js")(app)
+
 const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => {

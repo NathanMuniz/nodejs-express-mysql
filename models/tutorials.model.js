@@ -1,152 +1,129 @@
-const { query } = require('express')
-const mysql = require('./db.js')
+const sql = require("./db.js");
 
-const Tutorial = (tutorial) => {
-  self.title = tutorial.title
-  self.description = tutorial.description
-  self.published = tutorial.published
-}
-
+// constructor
+const Tutorial = function(tutorial) {
+  this.title = tutorial.title;
+  this.description = tutorial.description;
+  this.published = tutorial.published;
+};
 
 Tutorial.create = (newTutorial, result) => {
-  mysql.query("INSERT INTO tutorials SET ? ", newTutorial, (err, res) => {
+  sql.query("INSERT INTO tutorials SET ?", newTutorial, (err, res) => {
     if (err) {
-      console.log("error: ", err)
-      result(err, null)
+      console.log("error: ", err);
+      result(err, null);
       return;
     }
 
-    console.log("Tutorial Created", { id: res.insertId, ...newTutorial })
-    result(null, { id: res.insertId, ...newTutorial })
-
-  })
-
-}
+    console.log("created tutorial: ", { id: res.insertId, ...newTutorial });
+    result(null, { id: res.insertId, ...newTutorial });
+  });
+};
 
 Tutorial.findById = (id, result) => {
-  mysql.query(`SELECT * FROM tutorials WHERE id = ${id}`, (err, res) => {
+  sql.query(`SELECT * FROM tutorials WHERE id = ${id}`, (err, res) => {
     if (err) {
-      console.log("error: ", err)
-      result(err, null)
+      console.log("error: ", err);
+      result(err, null);
       return;
-
     }
 
     if (res.length) {
-      console.log("Tutorial find", res[0])
-      result(null, res[0])
+      console.log("found tutorial: ", res[0]);
+      result(null, res[0]);
       return;
     }
 
-    console.log(`not_found element with ${id}`)
-    result({ kind: "not_found" }, null)
+    // not found Tutorial with the id
+    result({ kind: "not_found" }, null);
+  });
+};
 
-  })
-}
-
-
-
-Tutorial.findAll = (title, result) => {
-  query = "SELECT * FROM tutorials"
+Tutorial.getAll = (title, result) => {
+  let query = "SELECT * FROM tutorials";
 
   if (title) {
-    query += `WHERE title = %${title}`
+    query += ` WHERE title LIKE '%${title}%'`;
   }
 
-  mysql.query(query, (err, res) => {
+  sql.query(query, (err, res) => {
     if (err) {
-      console.log("error: ", err)
-      result(null, err)
+      console.log("error: ", err);
+      result(null, err);
       return;
     }
 
-    if (res.length) {
-      console.log("Tutorials: ", res)
-      result(null, res)
-      return
-    }
+    console.log("tutorials: ", res);
+    result(null, res);
+  });
+};
 
-    result({ kind: "not_found" }, null)
-
-
-  })
-
-}
-
-Tutorial.published = (result) => {
-  mysql.query("SELECT * FROM tutorials WHERE published = true", (err, res) => {
+Tutorial.getAllPublished = result => {
+  sql.query("SELECT * FROM tutorials WHERE published=true", (err, res) => {
     if (err) {
-      console.log("Error: ", err)
-      result(err, null)
+      console.log("error: ", err);
+      result(null, err);
       return;
     }
 
-    console.log("Tutorals published: ", res)
-    result(null, res)
-
-  })
-}
+    console.log("tutorials: ", res);
+    result(null, res);
+  });
+};
 
 Tutorial.updateById = (id, tutorial, result) => {
-  mysql.query("UPDATE tutorials SET title = ?, description = ?, published = ? WHERE id = ?",
+  sql.query(
+    "UPDATE tutorials SET title = ?, description = ?, published = ? WHERE id = ?",
     [tutorial.title, tutorial.description, tutorial.published, id],
     (err, res) => {
       if (err) {
-        console.log("erro: ", err)
-        result(err, null)
+        console.log("error: ", err);
+        result(null, err);
         return;
       }
 
-      if (res.affctedRows == 0) {
-        console.log("Not found")
-        result({ kind: "not_found" }, null)
+      if (res.affectedRows == 0) {
+        // not found Tutorial with the id
+        result({ kind: "not_found" }, null);
         return;
       }
 
-      console.log("Tutorial updates: ", { id: id, ...tutorial })
-      result(null, { id: id, ...tutorial })
-    })
-}
+      console.log("updated tutorial: ", { id: id, ...tutorial });
+      result(null, { id: id, ...tutorial });
+    }
+  );
+};
 
-
-Tutorial.removeById = (id, result) => {
-  mysql.query(`DELETE FROM tutorials WHERE id = ${id}`, (err, res) => {
+Tutorial.remove = (id, result) => {
+  sql.query("DELETE FROM tutorials WHERE id = ?", id, (err, res) => {
     if (err) {
-      console.log("error: ", err)
-      result(err, null)
+      console.log("error: ", err);
+      result(null, err);
       return;
     }
 
-    if (res.affctedRows == 0) {
+    if (res.affectedRows == 0) {
+      // not found Tutorial with the id
       result({ kind: "not_found" }, null);
       return;
     }
 
-    console.log("delted tutorials with id: ", id)
-    result(null, res)
+    console.log("deleted tutorial with id: ", id);
+    result(null, res);
+  });
+};
 
-  })
-}
-
-
-Tutorial.remove = (result) => {
-  mysql.query("DELETE * FROM tutorials", (err, res) => {
+Tutorial.removeAll = result => {
+  sql.query("DELETE FROM tutorials", (err, res) => {
     if (err) {
-      console.log("error: ", err)
-      result(err, null)
+      console.log("error: ", err);
+      result(null, err);
+      return;
     }
 
-    if (res.affctedRows == 0) {
-      console.log("not_found")
-      result({ kind: "not_found" }, null)
-    }
-
-    console.log("All tutorials deleted")
-    result(null, res)
-
-
-
-  })
-}
+    console.log(`deleted ${res.affectedRows} tutorials`);
+    result(null, res);
+  });
+};
 
 module.exports = Tutorial;
