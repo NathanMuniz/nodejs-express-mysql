@@ -1,29 +1,38 @@
 import express from 'express';
+import cors from 'cors';
+import { route } from './router/router.js'
+
 const app = express();
 
-app.use((req, res, next) => {
-  console.log("Time: " + Date.now())
-  next()
+const corsOptions = {
+  origin: "http://localhost:8081"
+}
+
+app.use(cors(corsOptions))
+
+app.use(express.json())
+
+app.use(express.urlencoded({ extended: true }))
+
+
+app.get('/', (req, res) => {
+  res.json({ message: "Welcome to my applcation" })
 })
 
-app.get('/user/:id', (req, res, next) => {
-  if (req.params.id === "0") next('route')
-  else next()
-}, (req, res, next) => {
-  res.send('Next middleware')
-})
-
-app.get('/user/:id', (req, res, next) => {
-  res.send("Next route")
-})
+route(app)
 
 
 
-
-const PORT = 8080
+const PORT = 8080 || env.PORT;
 
 app.listen(PORT, () => {
-  console.log("localhost:8080")
+  console.log('http://localhost:8080')
 })
+
+
+
+
+
+
 
 
